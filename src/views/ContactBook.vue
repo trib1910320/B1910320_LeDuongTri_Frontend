@@ -11,15 +11,15 @@
             <ContactList v-if="filteredContactsCount > 0" :contacts="filteredContacts" v-model:activeIndex="activeIndex" />
             <p v-else>Không có liên hệ nào.</p>
             <div class="mt-3 row justify-content-around align-items-center">
-                <button class="btn btn-sm btn-primary" @click="refreshList()">
+                <button class="col-4 btn btn-sm btn-primary" @click="refreshList()">
                     <i class="fa-solid fa-rotate-right"></i> Làm mới
                 </button>
 
-                <button class="btn btn-sm btn-success" @click="goToAddContact">
+                <button class="col-4 btn btn-sm btn-success" @click="goToAddContact">
                     <i class="fa-solid fa-plus"></i> Thêm mới
                 </button>
 
-                <button class="btn btn-sm btn-danger" @click="removeAllContacts">
+                <button class="col-4 btn btn-sm btn-danger" @click="removeAllContacts">
                     <i class="fa-solid fa-trash-can"></i> Xóa tất cả
                 </button>
             </div>
@@ -31,13 +31,20 @@
                     <i class="fas fa-address-card"></i>
                 </h4>
                 <ContactCard :contact="activeContact" />
-                <router-link :to="{
-                    name: 'contact.edit',
-                    params: { id: activeContact._id },
-                }">
-                    <span class="mt-2 badge badge-warning">
-                        <i class="fas fa-edit"></i> Hiệu chỉnh</span>
-                </router-link>
+                <div class="d-flex">
+                    <router-link :to="{
+                        name: 'contact.edit',
+                        params: { id: activeContact._id },
+                    }">
+
+                        <button class="mx-2 btn btn-sm btn-warning">
+                            <i class="fas fa-edit"></i> Hiệu chỉnh
+                        </button>
+                    </router-link>
+                    <button class="mx-2 btn btn-sm btn-danger" @click="removeOneContact(activeContact)">
+                        <i class="fa-solid fa-trash-can"></i> Xóa liên hệ
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -105,6 +112,16 @@ export default {
             if (confirm("Bạn muốn xóa tất cả Liên hệ?")) {
                 try {
                     await ContactService.deleteAll();
+                    this.refreshList();
+                } catch (error) {
+                    console.log(error);
+                }
+            }
+        },
+        async removeOneContact(contact) {
+            if (confirm("Bạn muốn xóa Liên hệ có tên " + contact.name + " này không?")) {
+                try {
+                    await ContactService.delete(contact._id);
                     this.refreshList();
                 } catch (error) {
                     console.log(error);
